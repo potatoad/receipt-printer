@@ -2,7 +2,7 @@ from escpos.printer import Serial, Dummy
 
 p = Serial(
     # devfile="COM5",
-    devfile="/dev/tty.usbserial-8340"
+    devfile="/dev/tty.usbserial-8340",
     baudrate=38400,
     bytesize=8,
     parity="N",
