@@ -8,11 +8,10 @@ epson_profile = Profile()
 epson_profile_name = "TM-H6000III"
 
 tab = "   "
-list_data = []
-subtotal = 0
+# list_data = []
 
-with open("list.json") as json_list:
-    list_data = json.load(json_list)
+# with open("list.json") as json_list:
+#     list_data = json.load(json_list)
 
 with open("EPSON.json") as json_profile:
     profile_data = json.load(json_profile)
@@ -42,10 +41,96 @@ s = Serial(
 d = Dummy()
 
 
-def print_values(data):
-    print("Printing values:")
-    for entry in data:
-        print(f"Image: {entry['image']}, List: {entry['list']}")
+def print_receipt(logo, list):
+    list = eval(list)
+    
+    subtotal = 0
+    
+    d.set(align="center")
+    d.image(logo, center=True)
+
+    d.ln()
+    d.set(align="center", bold=True, double_height=True, double_width=True)
+    d.text("A QUEER.INK ZINE\n")
+
+    d.ln()
+
+    print(list)
+
+    for item in list:
+        print(item)
+        name = item["name"].upper()
+        name = name.ljust(30)
+        name = name[:30]
+
+        price = item["price"]
+        subtotal += float(price)
+        price = "£" + price
+        price = price.rjust(7)
+
+        d.set(
+            align="left",
+            bold=False,
+            double_height=False,
+            double_width=False,
+            normal_textsize=True,
+        )
+        d.textln(tab + name + " " + price)
+
+    d.ln()
+
+    d.set(bold=True)
+
+    total = str(subtotal)
+    total = "£" + total
+    total = total.rjust(7)
+
+    d.textln(tab + str(len(list)).ljust(4) + "BALANCE DUE".ljust(27) + total)
+
+    d.set()
+    d.textln(tab + tab + " " + "Visa Debit".ljust(27) + total)
+    d.set(bold=True)
+    d.text("       contactless ")
+    d.set(font="b", bold=True)
+    d.text(")")
+    d.set(font="a", bold=True)
+    d.text(")\n")
+    d.set()
+    d.ln()
+
+    d.textln("Cardholder Device Verified")
+    d.ln()
+    d.textln(tab + tab + " " + "Change".ljust(27) + "£0.00".rjust(7))
+    d.ln()
+    d.set(font="b", bold=False)
+    d.textln("********************************************************")
+    d.set(font="a", align="center")
+    d.text("HOW DID WE DO?\nLET US KNOW AT ")
+    d.set(bold=True, align="center")
+    d.text("HTTPS://QUEER.INK/\n")
+    d.set(bold=False, align="center")
+    d.textln("FOR A CHANCE TO WIN A PANIC ATTACK!")
+    d.set(font="b")
+    d.textln("********************************************************")
+
+    d.set(align="center", font="a")
+    d.textln("PLEASE KEEP FOR YOUR RECORDS\nYOU ARE VALUED AND YOU ARE LOVED")
+    d.ln()
+    d.barcode(
+        "{Bhttps://queer.ink/",
+        "CODE128",
+        width=2,
+        height=128,
+        pos="off",
+        function_type="B",
+    )
+    d.ln()
+    d.textln("Thank you for reading.")
+
+    d.cut()
+
+    s._raw(d.output)
+
 
 def main():
     sg.theme("LightBrown8")
@@ -64,7 +149,7 @@ def main():
             sg.InputText(key="-LIST_FILE-", enable_events=True),
             sg.FileBrowse(),
         ],
-        [sg.Multiline(key="-LIST_VIEW-",size=(56,15))],
+        [sg.Multiline(key="-LIST_VIEW-", size=(56, 15))],
         [sg.Button("Remove List")],
         [sg.Button("Print")],
     ]
@@ -98,99 +183,24 @@ def main():
                 print(f"Error loading image: {e}")
 
         if event == "-LIST_FILE-":
-            file_path = values["-LIST_FILE-"]
-            file = open(file_path, "r")
-            file_content = file.read()
+            # file_path = values["-LIST_FILE-"]
+            # file = open(file_path, "r")
+            # file_content = json.load(file.read())
+
+            with open(values["-LIST_FILE-"]) as json_list:
+                list_data = json.load(json_list)
+
             try:
-                window["-LIST_VIEW-"].update(value=file_content)
+                window["-LIST_VIEW-"].update(value=list_data)
             except Exception as e:
                 print(f"Error loading list: {e}")
 
         # Print values
         if event == "Print":
-            data = [
-                {"image": values["-IMAGE_FILE-"], "list": values["-LIST_VIEW-"]},
-            ]
-            print_values(data)
+            print_receipt(values["-IMAGE_FILE-"], values["-LIST_VIEW-"])
 
     window.close()
 
 
-d.set(align="center")
-d.image("Artboard 7.png", center=True)
-
-d.ln()
-d.set(align="center", bold=True, double_height=True, double_width=True)
-d.text("A QUEER.INK ZINE\n")
-
-d.ln()
-
-for item in list_data:
-    name = item["name"].upper()
-    name = name.ljust(30)
-    name = name[:30]
-
-    price = item["price"]
-    subtotal += float(price)
-    price = "£" + price
-    price = price.rjust(7)
-
-    d.set(
-        align="left",
-        bold=False,
-        double_height=False,
-        double_width=False,
-        normal_textsize=True,
-    )
-    d.textln(tab + name + " " + price)
-
-d.ln()
-
-d.set(bold=True)
-
-total = str(subtotal)
-total = "£" + total
-total = total.rjust(7)
-
-d.textln(tab + str(len(list_data)).ljust(4) + "BALANCE DUE".ljust(27) + total)
-
-d.set()
-d.textln(tab + tab + " " + "Visa Debit".ljust(27) + total)
-d.set(bold=True)
-d.text("       contactless ")
-d.set(font="b", bold=True)
-d.text(")")
-d.set(font="a", bold=True)
-d.text(")\n")
-d.set()
-d.ln()
-
-d.textln("Cardholder Device Verified")
-d.ln()
-d.textln(tab + tab + " " + "Change".ljust(27) + "£0.00".rjust(7))
-d.ln()
-d.set(font="b", bold=False)
-d.textln("********************************************************")
-d.set(font="a", align="center")
-d.text("HOW DID WE DO?\nLET US KNOW AT ")
-d.set(bold=True, align="center")
-d.text("HTTPS://QUEER.INK/\n")
-d.set(bold=False, align="center")
-d.textln("FOR A CHANCE TO WIN A PANIC ATTACK!")
-d.set(font="b")
-d.textln("********************************************************")
-
-d.set(align="center", font="a")
-d.textln("PLEASE KEEP FOR YOUR RECORDS\nYOU ARE VALUED AND YOU ARE LOVED")
-d.ln()
-d.barcode(
-    "{Bhttps://queer.ink/", "CODE128", width=2, height=128, pos="off", function_type="B"
-)
-d.ln()
-d.textln("Thank you for reading.")
-
-d.cut()
-
-# s._raw(d.output)
 if __name__ == "__main__":
     main()
