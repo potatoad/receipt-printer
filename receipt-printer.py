@@ -55,10 +55,7 @@ def print_receipt(logo, list):
 
     d.ln()
 
-    print(list)
-
     for item in list:
-        print(item)
         name = item["name"].upper()
         name = name.ljust(30)
         name = name[:30]
