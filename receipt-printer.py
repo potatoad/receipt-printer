@@ -1,8 +1,34 @@
 from escpos.printer import Serial, Dummy
+from escpos.capabilities import Profile
+import json
 
-p = Serial(
-    # devfile="COM5",
-    devfile="/dev/tty.usbserial-8340",
+epson_profile = Profile()
+epson_profile_name = "TM-H6000III"
+
+tab = "   "
+list_data = []
+subtotal = 0
+
+with open("list.json") as json_list:
+    list_data = json.load(json_list)
+
+with open("EPSON.json") as json_profile:
+    profile_data = json.load(json_profile)
+
+    epson_profile.profile_data["codePages"] = profile_data[epson_profile_name][
+        "codePages"
+    ]
+    epson_profile.profile_data["colors"] = profile_data[epson_profile_name]["colors"]
+    epson_profile.features = profile_data[epson_profile_name]["features"]
+    epson_profile.profile_data["fonts"] = profile_data[epson_profile_name]["fonts"]
+    epson_profile.profile_data["media"] = profile_data[epson_profile_name]["media"]
+    epson_profile.profile_data["name"] = profile_data[epson_profile_name]["name"]
+    epson_profile.profile_data["vendor"] = profile_data[epson_profile_name]["vendor"]
+    epson_profile.profile_data["notes"] = profile_data[epson_profile_name]["notes"]
+
+
+s = Serial(
+    devfile="COM7",
     baudrate=38400,
     bytesize=8,
     parity="N",
@@ -11,38 +37,48 @@ p = Serial(
     dsrdtr=True,
 )
 
-d = Dummy(profile="TM-H6000III")
+d = Dummy()
 
 d.set(align="center")
 d.image("Artboard 7.png", center=True)
+
 d.ln()
 d.set(align="center", bold=True, double_height=True, double_width=True)
 d.text("A QUEER.INK ZINE\n")
 
-d.set(align="center", font="b")
-d.set()
 d.ln()
 
-d.set(align="left")
-d.textln("   TAGLIATELLE PASTA 500G          £2.25")
-d.textln("   STONEBAKED PIZZA                £2.50")
-d.textln("   BRIGHT LIGHTS                   £1.80")
-d.textln("   LOTS OF SMELLS                  £3.50")
-d.textln("   LOTS OF PEOPLE                 £25.00")
-d.textln("   CHECKOUTS BEEPING               £6.00")
-d.textln("   IN-STORE MUSIC PLAYING         £12.80")
-d.textln("   PEOPLE LOOKING AT ME            £9.99")
-d.textln("   ARE THEY GOING TO HARASS ME?   £39.99")
-d.textln("   I WANT TO GO HOME               £2.10")
-d.textln("   I WANT TO BE SICK               £5.50")
+for item in list_data:
+    name = item["name"].upper()
+    name = name.ljust(30)
+    name = name[:30]
+
+    price = item["price"]
+    subtotal += float(price)
+    price = "£" + price
+    price = price.rjust(7)
+
+    d.set(
+        align="left",
+        bold=False,
+        double_height=False,
+        double_width=False,
+        normal_textsize=True,
+    )
+    d.textln(tab + name + " " + price)
 
 d.ln()
 
 d.set(bold=True)
-d.textln("   12 BALANCE DUE                £121.43")
+
+total = str(subtotal)
+total = "£" + total
+total = total.rjust(7)
+
+d.textln(tab + str(len(list_data)).ljust(4) + "BALANCE DUE".ljust(27) + total)
 
 d.set()
-d.textln("       Visa Debit                £121.43")
+d.textln(tab + tab + " " + "Visa Debit".ljust(27) + total)
 d.set(bold=True)
 d.text("       contactless ")
 d.set(font="b", bold=True)
@@ -54,9 +90,9 @@ d.ln()
 
 d.textln("Cardholder Device Verified")
 d.ln()
-d.textln("       Change                      £0.00")
+d.textln(tab + tab + " " + "Change".ljust(27) + "£0.00".rjust(7))
 d.ln()
-d.set(font="b")
+d.set(font="b", bold=False)
 d.textln("********************************************************")
 d.set(font="a", align="center")
 d.text("HOW DID WE DO?\nLET US KNOW AT ")
@@ -67,13 +103,13 @@ d.textln("FOR A CHANCE TO WIN A PANIC ATTACK!")
 d.set(font="b")
 d.textln("********************************************************")
 
-d.set(align="center")
-d.textln("PLEASE KEEP FOR YOUR RECORDS\nPUBLISHED TERMS AND CONDITIONS APPLY")
+d.set(align="center", font="a")
+d.textln("PLEASE KEEP FOR YOUR RECORDS\nYOU ARE VALUED AND YOU ARE LOVED")
 d.ln()
-d.barcode("{Bhttps://queer.ink/", "CODE128", width=2, pos="off", function_type="B")
+d.barcode("{Bhttps://queer.ink/", "CODE128", width=2, height=128, pos="off", function_type="B")
 d.ln()
 d.textln("Thank you for reading.")
 
 d.cut()
 
-# p._raw(d.output)
+s._raw(d.output)

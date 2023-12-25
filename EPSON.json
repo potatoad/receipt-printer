@@ -1,0 +1,56 @@
+{
+  "TM-H6000III": {
+    "codePages": {
+      "0": "CP437",
+      "1": "CP932",
+      "2": "CP850",
+      "3": "CP860",
+      "4": "CP863",
+      "5": "CP865",
+      "16": "CP1252",
+      "17": "CP866",
+      "18": "CP852",
+      "19": "CP858",
+      "254": "Unknown",
+      "255": "Unknown"
+    },
+    "colors": {
+      "0": "black",
+      "1": "red"
+    },
+    "features": {
+      "barcodeA": true,
+      "barcodeB": true,
+      "bitImageColumn": true,
+      "bitImageRaster": true,
+      "graphics": true,
+      "highDensity": true,
+      "paperFullCut": true,
+      "paperPartCut": true,
+      "pdf417Code": true,
+      "pulseBel": false,
+      "pulseStandard": true,
+      "qrCode": true,
+      "starCommands": false
+    },
+    "fonts": {
+      "0": {
+        "columns": 42,
+        "name": "Font A"
+      },
+      "1": {
+        "columns": 56,
+        "name": "Font B"
+      }
+    },
+    "media": {
+      "width": {
+        "mm": 80,
+        "pixels": 512
+      }
+    },
+    "name": "TM-H6000III",
+    "notes": "Epson TM-H6000III profile\n",
+    "vendor": "Epson"
+  }
+}
