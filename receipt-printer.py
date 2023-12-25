@@ -1,6 +1,8 @@
 from escpos.printer import Serial, Dummy
 from escpos.capabilities import Profile
 import json
+import PySimpleGUI as sg
+from PIL import Image, ImageTk
 
 epson_profile = Profile()
 epson_profile_name = "TM-H6000III"
@@ -38,6 +40,81 @@ s = Serial(
 )
 
 d = Dummy()
+
+
+def print_values(data):
+    print("Printing values:")
+    for entry in data:
+        print(f"Image: {entry['image']}, List: {entry['list']}")
+
+def main():
+    sg.theme("LightBrown8")
+
+    # Define layout
+    layout = [
+        [
+            sg.Text("Select Image File"),
+            sg.InputText(key="-IMAGE_FILE-", enable_events=True),
+            sg.FileBrowse(),
+        ],
+        [sg.Image(key="-IMAGE_VIEW-")],
+        [sg.Button("Remove Image")],
+        [
+            sg.Text("Select List File"),
+            sg.InputText(key="-LIST_FILE-", enable_events=True),
+            sg.FileBrowse(),
+        ],
+        [sg.Multiline(key="-LIST_VIEW-",size=(56,15))],
+        [sg.Button("Remove List")],
+        [sg.Button("Print")],
+    ]
+
+    # Create window
+    window = sg.Window("Image and Data Entry", layout, resizable=True, finalize=True)
+
+    while True:
+        event, values = window.read()
+
+        if event == sg.WINDOW_CLOSED:
+            break
+
+        if event == "Remove Image":
+            window["-IMAGE_FILE-"].update("")
+            window["-IMAGE_VIEW-"].update(data=None)
+
+        if event == "Remove List":
+            window["-LIST_FILE-"].update("")
+            window["-LIST_VIEW-"].update("")
+
+        # Update image preview when a file is selected
+        if event == "-IMAGE_FILE-":
+            file_path = values["-IMAGE_FILE-"]
+            try:
+                image = Image.open(file_path)
+                image.thumbnail((512, 512))
+                photo = ImageTk.PhotoImage(image)
+                window["-IMAGE_VIEW-"].update(data=photo)
+            except Exception as e:
+                print(f"Error loading image: {e}")
+
+        if event == "-LIST_FILE-":
+            file_path = values["-LIST_FILE-"]
+            file = open(file_path, "r")
+            file_content = file.read()
+            try:
+                window["-LIST_VIEW-"].update(value=file_content)
+            except Exception as e:
+                print(f"Error loading list: {e}")
+
+        # Print values
+        if event == "Print":
+            data = [
+                {"image": values["-IMAGE_FILE-"], "list": values["-LIST_VIEW-"]},
+            ]
+            print_values(data)
+
+    window.close()
+
 
 d.set(align="center")
 d.image("Artboard 7.png", center=True)
@@ -106,10 +183,14 @@ d.textln("********************************************************")
 d.set(align="center", font="a")
 d.textln("PLEASE KEEP FOR YOUR RECORDS\nYOU ARE VALUED AND YOU ARE LOVED")
 d.ln()
-d.barcode("{Bhttps://queer.ink/", "CODE128", width=2, height=128, pos="off", function_type="B")
+d.barcode(
+    "{Bhttps://queer.ink/", "CODE128", width=2, height=128, pos="off", function_type="B"
+)
 d.ln()
 d.textln("Thank you for reading.")
 
 d.cut()
 
-s._raw(d.output)
+# s._raw(d.output)
+if __name__ == "__main__":
+    main()
