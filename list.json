@@ -1,13 +1,26 @@
 [
-  {"name": "TEST", "price": "3.00"},
-  {"name": "STONEBAKED PIZZA", "price": "1.00"},
-  {"name": "BRIGHT LIGHTS", "price": "1.00"},
-  {"name": "LOTS OF SMELLS", "price": "3.50"},
-  {"name": "LOTS OF PEOPLE", "price": "25.00"},
-  {"name": "CHECKOUTS BEEPING", "price": "6.00"},
-  {"name": "IN-STORE MUSIC PLAYING", "price": "12.80"},
-  {"name": "PEOPLE LOOKING AT ME", "price": "9.99"},
-  {"name": "ARE THEY GOING TO HARASS ME?", "price": "39.99"},
-  {"name": "I WANT TO GO HOME", "price": "2.10"},
-  {"name": "I WANT TO BE SICK", "price": "5.50"}
+  {"name": "I only need to buy some food",    "price": "0.00"},
+  {"name": "Potatoes, onions, hummus, bread", "price": "0.00"},
+  {"name": "and yet I find myself pursued",   "price": "0.00"},
+  {"name": "by an ever increasing dread.",    "price": "0.00"},
+
+  {"name": "The supermarket is really busy",  "price": "0.00"},
+  {"name": "I wont freak out",                "price": "0.00"},
+  {"name": "My muscles tense, I feel dizzy",  "price": "0.00"},
+  {"name": "I can't freak out",               "price": "0.00"},
+
+  {"name": "Bright fluorescent lights aglow", "price": "0.00"},
+  {"name": "Checkouts beep, trolleys sprawl", "price": "0.00"},
+  {"name": "Lining up the dominoes",          "price": "0.00"},
+  {"name": "Just for them to fall",           "price": "0.00"},
+
+  {"name": "Potatoes, onions, hummus, bread", "price": "0.00"},
+  {"name": "Slow breaths, deep",              "price": "0.00"},
+  {"name": "Potatoes, onions, hummus, bread", "price": "0.00"},
+  {"name": "Slow breaths, start to weep",     "price": "0.00"},
+
+  {"name": "Overwhelmed by smells & sound",   "price": "0.00"},
+  {"name": "Drop the food and leave the shop","price": "0.00"},
+  {"name": "Crumple sobbing to the ground",   "price": "0.00"},
+  {"name": "Waiting for the panic to stop",   "price": "0.00"}
 ]

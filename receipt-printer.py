@@ -7,12 +7,6 @@ from PIL import Image, ImageTk
 epson_profile = Profile()
 epson_profile_name = "TM-H6000III"
 
-tab = "   "
-# list_data = []
-
-# with open("list.json") as json_list:
-#     list_data = json.load(json_list)
-
 with open("EPSON.json") as json_profile:
     profile_data = json.load(json_profile)
 
@@ -41,11 +35,23 @@ s = Serial(
 d = Dummy()
 
 
+def format_item(item):
+    tab = "   "
+    name = item["name"].upper()
+    name = name.ljust(31)
+    name = name[:31]
+
+    price = item["price"]
+    price = "£" + price
+    price = price.rjust(7)
+
+    return tab + name + " " + price
+
+
 def print_receipt(logo, list):
     list = eval(list)
-    
     subtotal = 0
-    
+
     d.set(align="center")
     d.image(logo, center=True)
 
@@ -56,15 +62,6 @@ def print_receipt(logo, list):
     d.ln()
 
     for item in list:
-        name = item["name"].upper()
-        name = name.ljust(30)
-        name = name[:30]
-
-        price = item["price"]
-        subtotal += float(price)
-        price = "£" + price
-        price = price.rjust(7)
-
         d.set(
             align="left",
             bold=False,
@@ -72,7 +69,7 @@ def print_receipt(logo, list):
             double_width=False,
             normal_textsize=True,
         )
-        d.textln(tab + name + " " + price)
+        d.textln(format_item(item))
 
     d.ln()
 
@@ -146,13 +143,15 @@ def main():
             sg.InputText(key="-LIST_FILE-", enable_events=True),
             sg.FileBrowse(),
         ],
-        [sg.Multiline(key="-LIST_VIEW-", size=(56, 15))],
+        [sg.Multiline(key="-LIST_VIEW-", size=(56, 15), font="Courier")],
         [sg.Button("Remove List")],
         [sg.Button("Print")],
     ]
 
     # Create window
-    window = sg.Window("Image and Data Entry", layout, resizable=True, finalize=True)
+    window = sg.Window(
+        "The queer.ink Receipt Printer", layout, resizable=True, finalize=True
+    )
 
     while True:
         event, values = window.read()
@@ -180,15 +179,13 @@ def main():
                 print(f"Error loading image: {e}")
 
         if event == "-LIST_FILE-":
-            # file_path = values["-LIST_FILE-"]
-            # file = open(file_path, "r")
-            # file_content = json.load(file.read())
-
             with open(values["-LIST_FILE-"]) as json_list:
                 list_data = json.load(json_list)
-
+                formatted_list_data = ""
+                for item in list_data:
+                    formatted_list_data += format_item(item) + "\n"
             try:
-                window["-LIST_VIEW-"].update(value=list_data)
+                window["-LIST_VIEW-"].update(value=formatted_list_data)
             except Exception as e:
                 print(f"Error loading list: {e}")
 
